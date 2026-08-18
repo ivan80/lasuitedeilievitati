@@ -1,0 +1,104 @@
+{
+  "theme": "light",
+  "typography": {
+    "headings": {
+      "family": "Cormorant Garamond",
+      "weights": ["400", "500", "600", "700"],
+      "usage": "H1, H2, Hero sections, Recipe titles, and major calculator labels. Must use tracking-tight."
+    },
+    "body": {
+      "family": "Manrope",
+      "weights": ["400", "500", "700"],
+      "usage": "Data, UI elements, paragraphs, timers, calculators, input labels."
+    },
+    "instructions": "Import both fonts via Google Fonts in index.css. Use fluid scaling for headings (e.g., text-4xl sm:text-5xl lg:text-6xl for H1). Do not use generic fonts like Inter for headings to maintain the artisan feel."
+  },
+  "colors": {
+    "palette": {
+      "background": "#FAFAF8",
+      "surface": "#F4F3ED",
+      "primary_text": "#1C1917",
+      "secondary_text": "#57534E",
+      "accent_cta": "#C2533B",
+      "accent_hover": "#A6442E",
+      "success_olive": "#748C63",
+      "border": "#E6E4DD",
+      "tinted_dark": "#292524"
+    },
+    "rules": "Avoid pure black/white. Never use flat SaaS blue. The theme is 'Organic & Earthy' (Archetype 1) mimicking flour, baked crust, and olive oil. Ensure high contrast for text (APCA standard). Only use accent_cta for primary actions like 'Calcola' (Calculate), 'Salva' (Save)."
+  },
+  "visual_enhancers": {
+    "surfaces": "Flat Solid surfaces with 1px border-border (Muted Sand). No heavy neumorphism. Subtle ambient shadows (shadow-sm) for recipe cards, and shadow-lg on hover with -translate-y-1 for interactivity.",
+    "textures": "Use a subtle grain/noise background image overlay on the main container with low opacity (mix-blend-multiply opacity-20) to kill digital flatness and simulate a physical, tactile flour-dusted workspace.",
+    "icons": "Use @phosphor-icons/react for thin, elegant, high-end iconography that matches the artisanal vibe."
+  },
+  "grids_and_layouts": {
+    "calculators": "Mode B: High Density Grid. grid-cols-1 md:grid-cols-3 lg:grid-cols-4 with tight gap-4 or gap-6. Every pixel utilized. Used for 'Calcolatore Impasto' (Dough Calculator), 'Forza Farina (W)' (W Blend Calculator), and 'Lievitazione' (Leavening Timers).",
+    "recipe_library": "Mode A: The Tetris Grid. Asymmetric grid for recipe browsing. grid-cols-1 md:grid-cols-8 lg:grid-cols-12 with wide gap-8. Mix tall and wide image cards for visual tension.",
+    "spacing": "Generous Spacing Philosophy. Use p-6, p-8, p-12. Containers with borders MUST have generous internal padding to avoid text collision."
+  },
+  "components": {
+    "strategy": "Use pure HTML/Tailwind for the marketing/landing presentation. Use Shadcn UI strictly for functional logic (forms, inputs, tabs, sliders, dialogs) but heavily customize them by stripping the default 'Vercel' look to fit the warm artisan brand.",
+    "banned": "Card-heavy UI for deep calculators (go flat/cardless instead). Transparent backgrounds on headers without backdrop-blur.",
+    "specific_usage": "Use Tabs for switching Preferments (Biga, Poolish, Water Roux). Use Sliders for Hydration (Idratazione) %. Badges for flour W strength."
+  },
+  "motion": {
+    "interactions": "Hover states must lighten/darken clearly (e.g., hover:bg-[#A6442E] hover:text-white). Micro-interactions on form inputs. Entrance animations for recipe lists using Framer Motion (staggered fade-up). Image hover triggers subtle scale (1.05)."
+  },
+  "accessibility": {
+    "contrast": "Ensure min 4.5:1 for body text. Interactive elements must have clear focus states (e.g., focus:ring-2 focus:ring-[#C2533B] focus:outline-none).",
+    "testing": "All interactive elements MUST include data-testid attribute (e.g., data-testid='calculate-dough-button', data-testid='login-google-button')."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1549413468-cd78edb7e75c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHw0fHxhcnRpc2FuJTIwc291cmRvdWdoJTIwYnJlYWR8ZW58MHx8fHwxNzg3MDkxNzI1fDA&ixlib=rb-4.1.0&q=85",
+        "category": "hero_or_bread",
+        "description": "Artisan sourdough bread on jute - perfect for 'Pane' category or the Main Hero background."
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxuZWFwb2xpdGFuJTIwcGl6emF8ZW58MHx8fHwxNzg3MDkxNzI1fDA&ixlib=rb-4.1.0&q=85",
+        "category": "pizza_tonda",
+        "description": "Neapolitan round pizza - perfect for 'Pizza Tonda' category card."
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1621792955481-c99c3862283a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwzfHxmb2NhY2NpYXxlbnwwfHx8fDE3ODcwOTE3MjV8MA&ixlib=rb-4.1.0&q=85",
+        "category": "focaccia",
+        "description": "Person holding white ceramic bowl with focaccia bread - 'Focaccia' category."
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1537734796389-e1fc293cf856?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAxODF8MHwxfHNlYXJjaHwzfHxiYWtlciUyMGtuZWFkaW5nJTIwZG91Z2h8ZW58MHx8fHwxNzg3MDkxNzI1fDA&ixlib=rb-4.1.0&q=85",
+        "category": "dough_prep",
+        "description": "Person holding/kneading dough - great for Dough Calculator background or empty states."
+      }
+    ],
+    "rules": "Never use placeholder images. If placing text over images, use a max black overlay (e.g., bg-black/40) or gradient overlay to maintain text legibility."
+  },
+  "instructions_to_main_agent": [
+    "Read this entire JSON carefully before writing code.",
+    "Execute commands to install required dependencies: yarn add @phosphor-icons/react framer-motion sonner",
+    "Use Javascript (.js/.jsx), NOT Typescript, for all created components, as the current environment uses App.js.",
+    "Implement the 'Organic & Earthy' Archetype accurately using the provided color hex codes. Do NOT deviate to generic SaaS blues or teals.",
+    "The UI must be entirely in Italian (e.g., 'Calcola Impasto', 'Lievitazione', 'Aggiungi Ricetta', 'Biga', 'Poolish').",
+    "Implement the bento grids (Mode B for calculators, Mode A for recipe galleries).",
+    "Make sure forms and input layouts are left-aligned for data legibility.",
+    "Header must have a background (e.g., crystal glass backdrop-blur-xl bg-white/70) - do not leave it fully transparent over content.",
+    "For Shadcn UI components, use standard generic commands but implement them as .js."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Use sonner for toasts. Sonner component are located in /app/frontend/src/components/ui/sonner.js (or .jsx)"
+  ]
+}
