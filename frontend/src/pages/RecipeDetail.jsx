@@ -4,11 +4,13 @@ import { Layout } from "../components/Layout";
 import { DoughBreakdown } from "../components/DoughBreakdown";
 import { LeaveningPlanner } from "../components/LeaveningPlanner";
 import { AISuggest } from "../components/AISuggest";
+import { TimersPanel } from "../components/TimersPanel";
 import { CATEGORY_MAP, PREFERMENT_LABELS } from "../lib/categories";
 import { computeBlend } from "../lib/doughMath";
+import { exportRecipePdf } from "../lib/pdf";
 import api from "../lib/api";
 import { toast } from "sonner";
-import { PencilSimple, Printer, Trash, ArrowLeft, Gauge } from "@phosphor-icons/react";
+import { PencilSimple, Printer, Trash, ArrowLeft, Gauge, Copy, FilePdf } from "@phosphor-icons/react";
 import { Badge } from "../components/ui/badge";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -43,6 +45,16 @@ export default function RecipeDetail() {
     navigate("/ricette");
   };
 
+  const handleDuplicate = async () => {
+    try {
+      const res = await api.post(`/recipes/${id}/duplicate`);
+      toast.success("Ricetta duplicata");
+      navigate(`/ricette/${res.data.id}`);
+    } catch (e) {
+      toast.error("Errore nella duplicazione");
+    }
+  };
+
   if (loading || !recipe) {
     return <Layout><p className="text-clay">Caricamento…</p></Layout>;
   }
@@ -75,6 +87,12 @@ export default function RecipeDetail() {
             </button>
             <button data-testid="print-recipe-button" onClick={() => window.print()} className="inline-flex items-center gap-2 bg-card border border-line hover:border-clay text-ink font-medium px-5 py-2.5 rounded-full transition-colors duration-300">
               <Printer size={18} /> Stampa
+            </button>
+            <button data-testid="export-pdf-button" onClick={() => exportRecipePdf(recipe)} className="inline-flex items-center gap-2 bg-card border border-line hover:border-clay text-ink font-medium px-5 py-2.5 rounded-full transition-colors duration-300">
+              <FilePdf size={18} /> Esporta PDF
+            </button>
+            <button data-testid="duplicate-recipe-button" onClick={handleDuplicate} className="inline-flex items-center gap-2 bg-card border border-line hover:border-clay text-ink font-medium px-5 py-2.5 rounded-full transition-colors duration-300">
+              <Copy size={18} /> Duplica
             </button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -144,8 +162,11 @@ export default function RecipeDetail() {
 
         <div className="lg:col-span-2 space-y-8 print:hidden">
           {(recipe.ferment_steps || []).length > 0 && (
+            <TimersPanel recipeId={recipe.id} steps={recipe.ferment_steps} />
+          )}
+          {(recipe.ferment_steps || []).length > 0 && (
             <div>
-              <h4 className="font-heading text-2xl tracking-tight text-ink mb-4">Lievitazione</h4>
+              <h4 className="font-heading text-2xl tracking-tight text-ink mb-4">Programma lievitazione</h4>
               <LeaveningPlanner steps={recipe.ferment_steps} setSteps={() => {}} editable={false} />
             </div>
           )}

@@ -238,6 +238,18 @@ async def delete_recipe(recipe_id: str, user: User = Depends(get_current_user)):
     return {"ok": True}
 
 
+@api_router.post("/recipes/{recipe_id}/duplicate", response_model=Recipe)
+async def duplicate_recipe(recipe_id: str, user: User = Depends(get_current_user)):
+    doc = await db.recipes.find_one({"id": recipe_id, "user_id": user.user_id}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Ricetta non trovata")
+    base = RecipeInput(**{k: v for k, v in doc.items() if k in RecipeInput.model_fields})
+    copy = Recipe(user_id=user.user_id, **base.model_dump())
+    copy.name = f"{doc.get('name', 'Ricetta')} (copia)"
+    await db.recipes.insert_one(copy.model_dump())
+    return copy
+
+
 # ---------------- Upload / Files ----------------
 @api_router.post("/upload")
 async def upload(file: UploadFile = File(...), user: User = Depends(get_current_user)):

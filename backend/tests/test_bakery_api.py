@@ -131,6 +131,54 @@ class TestRecipes:
         assert r.status_code == 404
 
 
+# ---------------- Duplicate ----------------
+class TestDuplicate:
+    def test_duplicate_recipe(self, client):
+        payload = {
+            "name": "TEST_Focaccia Base",
+            "category": "focaccia",
+            "description": "Focaccia genovese",
+            "pieces": 1,
+            "piece_weight": 800,
+            "hydration": 75,
+            "salt": 2.0,
+            "yeast": 0.5,
+            "yeast_type": "secco",
+            "preferment_type": "diretto",
+            "preferment_flour_percent": 0,
+        }
+        r = client.post(f"{API}/recipes", json=payload)
+        assert r.status_code == 200, r.text
+        original = r.json()
+        oid = original["id"]
+
+        # Duplicate
+        r = client.post(f"{API}/recipes/{oid}/duplicate")
+        assert r.status_code == 200, r.text
+        dup = r.json()
+        assert dup["id"] != oid
+        assert dup["name"] == "TEST_Focaccia Base (copia)"
+        assert dup["category"] == "focaccia"
+        assert dup["hydration"] == 75
+
+        # GET verifies persistence
+        r = client.get(f"{API}/recipes/{dup['id']}")
+        assert r.status_code == 200
+        assert r.json()["name"] == "TEST_Focaccia Base (copia)"
+
+        # Original still present
+        r = client.get(f"{API}/recipes/{oid}")
+        assert r.status_code == 200
+
+        # Cleanup
+        client.delete(f"{API}/recipes/{oid}")
+        client.delete(f"{API}/recipes/{dup['id']}")
+
+    def test_duplicate_nonexistent_returns_404(self, client):
+        r = client.post(f"{API}/recipes/nonexistent-id-xyz/duplicate")
+        assert r.status_code == 404
+
+
 # ---------------- Upload / Files ----------------
 class TestUpload:
     def test_upload_and_download(self, token):
