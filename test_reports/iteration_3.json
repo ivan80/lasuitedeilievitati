@@ -1,0 +1,27 @@
+{
+  "summary": "Verified 8 new 'Lievita' features end-to-end. Backend pytest expanded to 12/12 passing (added TestFlours with per-user scoping + TestRecipeBiga persistence + grams-mode persistence). Frontend (seeded session_token cookie in Mongo test_database) validated: (1) Flour archive /farine - flour-form-name/brand/w/protein/absorption/notes + flour-form-save creates a card in flour-list showing 'TEST_UI_Flour' with W badge; flour-delete-<id> removes it (empty state 'Archivio vuoto' returns). (2) Calcolatore /calcolatore: selecting Biga via select-preferment reveals biga-management + select-biga-hours (default 22 selectable from 18-24). With 'In frigo' + preferment=biga the info text reads: 'Biga al 60% di idratazione, 1% di lievito fresco sulla farina della biga. Dopo l'impasto: 1 ora a TA, poi 22 ore in frigo. Aggiunto 0,5% di malto diastasico (consigliato).' Malto row shows 0.5% (0 → 0.5% floor applied). (3) Grams mode: toggling mode-grams shows input-flour-g/water-g/salt-g/yeast-g/oil-g/sugar-g/malt-g; entering 1000g flour + 700g water yields breakdown 'Farina 1000g / Acqua (70%) 700g / Sale (2.5%) 25g / Lievito 0.3% 3g'. (4) Multiple flours with biga on /ricette/nuova Farine tab: renders 'Farine per la biga' + 'Farine per l'impasto finale' groups. (5) Lievitazione tab 'apply-biga-schedule' button seeds 'Biga · 1h a TA' + 'Biga · maturazione frigo (20h @ 4°C)' + existing Puntata step. (6) Dashboard: 5 category images all unique unsplash IDs (1574071 pizza_tonda, 1705537 pizza_teglia, 1621792 focaccia, 1549413 pane, 1481391 grandi_lievitati) - pizza_teglia ≠ focaccia, pane ≠ grandi_lievitati confirmed. (7) Rename verified: nav-logo text = 'Lievita'. (8) Regression: dashboard/ricette/calcolatore load without console errors, existing CRUD/duplicate/upload/AI tests still pass in pytest.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_bakery_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "FlourDoc/FlourInput and flour endpoints correctly scope by user_id and return 404 for non-owned/nonexistent (verified via cross-user test).",
+    "computeDough enforces Math.max(malt, 0.5) when biga selected, and yeast = prefFlourPct * 1% - matches spec exactly.",
+    "bigaSchedule(management, fridgeHours) returns 1h TA + Nh Frigo for frigo mode, and single 18°C/18h step for TA mode. Correct.",
+    "server.py FlourItem.use field defaults to 'impasto' - biga groups on FlourBlend use this to split. Good.",
+    "Route '/' still returns 'Lievita API' - rename applied on backend banner too.",
+    "Category images: all 5 distinct unsplash photo IDs confirmed unique via runtime img.src check - previous duplicates (pizza_teglia==focaccia, pane==grandi_lievitati) resolved.",
+    "input_mode='grams' properly persists on recipe POST/GET and DoughBreakdown converts g→% for display."
+  ],
+  "updated_files": ["/app/backend/tests/test_bakery_api.py"],
+  "success_rate": {"backend": "100% (12/12)", "frontend": "100% of tested flows (8/8 new items)"},
+  "test_credentials": "Emergent Google OAuth. Seed session in Mongo test_database (users + user_sessions) per /app/auth_testing.md. Bearer for backend, session_token cookie (sameSite None, secure) for browser.",
+  "seed_data_creation": "Created + cleaned up 2 test users, 2 sessions, and test flours/recipes. Cleanup handled by pytest fixture and post-test mongosh script.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend suite at /app/backend/tests/test_bakery_api.py now covers Auth, Recipes CRUD+filter, Duplicate (owner-scoped 404), Flours CRUD + cross-user scoping, Recipe biga_management/biga_fridge_hours persistence, Grams-mode persistence, Upload, AI. Run: pytest /app/backend/tests/test_bakery_api.py -v. For FE, biga logic lives in DoughForm.jsx + doughMath.js; the info string 'Biga al X% di idratazione, 1% di lievito fresco...' is rendered inline. Flour archive at /farine uses [data-testid=flour-list] wrapping cards; empty state does NOT expose data-testid=flour-list (renders separate empty component).",
+  "rca of the issue": "No issues found. All 8 new features + regression pass."
+}

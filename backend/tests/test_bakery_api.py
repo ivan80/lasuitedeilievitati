@@ -179,6 +179,119 @@ class TestDuplicate:
         assert r.status_code == 404
 
 
+# ---------------- Flours ----------------
+class TestFlours:
+    def test_flour_crud_and_scoping(self, client, token):
+        # Create
+        payload = {"name": "TEST_Caputo Cuoco", "brand": "Caputo", "w": 320, "protein": 13.0, "absorption": 60.0, "notes": "pizza napoletana"}
+        r = client.post(f"{API}/flours", json=payload)
+        assert r.status_code == 200, r.text
+        flour = r.json()
+        assert flour["name"] == payload["name"]
+        assert flour["w"] == 320
+        assert flour["protein"] == 13.0
+        assert "id" in flour and "user_id" in flour
+        fid = flour["id"]
+
+        # List
+        r = client.get(f"{API}/flours")
+        assert r.status_code == 200
+        assert any(f["id"] == fid for f in r.json())
+
+        # Delete
+        r = client.delete(f"{API}/flours/{fid}")
+        assert r.status_code == 200
+
+        # 404 after delete
+        r = client.delete(f"{API}/flours/{fid}")
+        assert r.status_code == 404
+
+    def test_flour_scoping_other_user(self, client, token):
+        # Create as user A
+        r = client.post(f"{API}/flours", json={"name": "TEST_SoloA", "w": 280})
+        assert r.status_code == 200
+        fid = r.json()["id"]
+
+        # Different user session
+        mc = MongoClient(MONGO_URL)
+        db = mc[DB_NAME]
+        uid2 = f"test-user-b-{int(time.time())}"
+        tok2 = f"test_session_b_{int(time.time())}"
+        db.users.insert_one({"user_id": uid2, "email": f"qb.{int(time.time())}@example.com", "name": "QA B", "picture": None, "created_at": datetime.now(timezone.utc).isoformat()})
+        db.user_sessions.insert_one({"user_id": uid2, "session_token": tok2, "expires_at": (datetime.now(timezone.utc)+timedelta(days=1)).isoformat(), "created_at": datetime.now(timezone.utc).isoformat()})
+        try:
+            s2 = requests.Session()
+            s2.headers.update({"Authorization": f"Bearer {tok2}"})
+            # B cannot see A's flour
+            r = s2.get(f"{API}/flours")
+            assert r.status_code == 200
+            assert not any(f["id"] == fid for f in r.json())
+            # B cannot delete A's flour
+            r = s2.delete(f"{API}/flours/{fid}")
+            assert r.status_code == 404
+        finally:
+            db.flour_archive.delete_many({"user_id": uid2})
+            db.users.delete_one({"user_id": uid2})
+            db.user_sessions.delete_one({"session_token": tok2})
+            mc.close()
+
+        # Cleanup A
+        client.delete(f"{API}/flours/{fid}")
+
+
+# ---------------- Recipe biga persistence ----------------
+class TestRecipeBiga:
+    def test_biga_fridge_recipe_persists(self, client):
+        payload = {
+            "name": "TEST_Teglia Biga Frigo",
+            "category": "pizza_teglia",
+            "description": "biga frigo 22h",
+            "pieces": 1,
+            "piece_weight": 1000,
+            "hydration": 75,
+            "salt": 2.5,
+            "yeast": 0.0,
+            "yeast_type": "fresco",
+            "preferment_type": "biga",
+            "preferment_flour_percent": 50,
+            "biga_management": "frigo",
+            "biga_fridge_hours": 22,
+        }
+        r = client.post(f"{API}/recipes", json=payload)
+        assert r.status_code == 200, r.text
+        rid = r.json()["id"]
+        r = client.get(f"{API}/recipes/{rid}")
+        assert r.status_code == 200
+        d = r.json()
+        assert d["preferment_type"] == "biga"
+        assert d["biga_management"] == "frigo"
+        assert d["biga_fridge_hours"] == 22
+        client.delete(f"{API}/recipes/{rid}")
+
+    def test_grams_mode_recipe_persists(self, client):
+        payload = {
+            "name": "TEST_Grams Mode",
+            "category": "focaccia",
+            "input_mode": "grams",
+            "flour_g": 1000,
+            "water_g": 700,
+            "salt_g": 25,
+            "yeast_g": 3,
+            "pieces": 1,
+            "piece_weight": 1728,
+        }
+        r = client.post(f"{API}/recipes", json=payload)
+        assert r.status_code == 200, r.text
+        rid = r.json()["id"]
+        r = client.get(f"{API}/recipes/{rid}")
+        assert r.status_code == 200
+        d = r.json()
+        assert d["input_mode"] == "grams"
+        assert d["flour_g"] == 1000
+        assert d["water_g"] == 700
+        client.delete(f"{API}/recipes/{rid}")
+
+
 # ---------------- Upload / Files ----------------
 class TestUpload:
     def test_upload_and_download(self, token):
