@@ -6,7 +6,7 @@ import { LeaveningPlanner } from "../components/LeaveningPlanner";
 import { AISuggest } from "../components/AISuggest";
 import { TimersPanel } from "../components/TimersPanel";
 import { CATEGORY_MAP, PREFERMENT_LABELS } from "../lib/categories";
-import { computeBlend, computeDough, round } from "../lib/doughMath";
+import { computeBlend, computeDough, computeFlourGrams, round } from "../lib/doughMath";
 import { exportRecipePdf } from "../lib/pdf";
 import api from "../lib/api";
 import { toast } from "sonner";
@@ -129,12 +129,28 @@ export default function RecipeDetail() {
             <div className="bg-card border border-line rounded-2xl p-6">
               <h4 className="font-heading text-2xl tracking-tight text-ink mb-4">Mix di farine · W {wAvg}</h4>
               <div className="space-y-2">
-                {validFlours.map((f, i) => (
-                  <div key={i} className="flex items-center justify-between py-1.5 border-b border-line/60 text-sm">
-                    <span className="text-ink">{f.name || "Farina"}</span>
-                    <span className="text-clay">W {f.w || "—"} · {f.percent}%</span>
-                  </div>
-                ))}
+                {(() => {
+                  const grams = computeFlourGrams(recipe);
+                  const isBiga = recipe.preferment_type === "biga";
+                  return (recipe.flours || []).map((f, i) => {
+                    if (!f.name && !f.percent) return null;
+                    return (
+                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-line/60 text-sm">
+                        <span className="text-ink flex items-center gap-2">
+                          {f.name || "Farina"}
+                          {isBiga && (
+                            <span className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${f.use === "biga" ? "bg-olive/20 text-olive" : "bg-crust/10 text-crust"}`}>
+                              {f.use === "biga" ? "biga" : "impasto"}
+                            </span>
+                          )}
+                        </span>
+                        <span className="text-clay tabular-nums">
+                          W {f.w || "—"} · {f.percent}% · <span className="font-medium text-ink">{round(grams[i] || 0, 0)}g</span>
+                        </span>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
           )}

@@ -126,6 +126,27 @@ export function bigaSchedule(management, fridgeHours) {
   return [{ label: "Biga · 18°C", location: "TA", temperature: 18, hours: 18 }];
 }
 
+export function computeFlourGrams(params) {
+  const list = params.flours || [];
+  const dough = computeDough(params);
+  const grams = {};
+  const split = (idxs, total) => {
+    const pctSum = idxs.reduce((s, i) => s + Number(list[i].percent || 0), 0);
+    idxs.forEach((i) => {
+      grams[i] = pctSum > 0 ? (total * Number(list[i].percent || 0)) / pctSum : 0;
+    });
+  };
+  if (params.preferment_type === "biga") {
+    const bigaIdx = list.map((f, i) => (f.use === "biga" ? i : -1)).filter((i) => i >= 0);
+    const impIdx = list.map((f, i) => (f.use !== "biga" ? i : -1)).filter((i) => i >= 0);
+    split(bigaIdx, dough.preferment ? dough.preferment.flour : 0);
+    split(impIdx, dough.preferment ? dough.preferment.final.flour : dough.flour);
+  } else {
+    split(list.map((_, i) => i), dough.flour);
+  }
+  return grams;
+}
+
 export function round(n, d = 1) {
   const f = Math.pow(10, d);
   return Math.round((Number(n) || 0) * f) / f;

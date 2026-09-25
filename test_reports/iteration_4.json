@@ -1,0 +1,31 @@
+{
+  "summary": "Frontend-only regression: verified grams-mode multi-flour distribution + biga split in FlourBlend (Calcolatore + RecipeForm). All 5 requested checks pass. Seeded session_token cookie in Mongo test_database and reloaded to auth.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/test_bakery_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "FlourBlend.jsx correctly derives per-flour grams via splitGroup(indices, groupTotal) using percent-share within group; no reliance on percentages summing to 100 (works even if Σ≠100).",
+    "Biga groups use dough.preferment.flour and dough.preferment.final.flour from computeDough; final = flour - prefFlour (correct even when Σ salt/hydration change totalDough).",
+    "flour-grams-<i> id is stable across grams/percent mode toggling; live-updates on percent change without needing tab re-mount.",
+    "DoughForm grams-mode hint contains 'Farine (W)' link and appends ', divisa automaticamente tra biga e impasto finale.' only when preferment_type==='biga' - matches spec.",
+    "Group header shows 'Tot. <groupGrams>g' badge (small UX nicety) that mirrors subtitle numbers (e.g., 500g biga / 500g final at 50% split).",
+    "Recipe saves successfully with grams mode + multiple flours (POST /api/recipes returns 200 and detail page renders).",
+    "Minor: on RecipeForm detail page, per-flour grams (720/480 breakdown) is not shown - only aggregate 'Farina 1200g'. Not requested but could be a follow-up enhancement to render flour blend breakdown on the recipe detail."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (frontend-only per request)", "frontend": "100% (5/5 tests pass)"},
+  "test_credentials": "Seeded Mongo test_database session_token cookie; cleaned up after tests.",
+  "seed_data_creation": "1 test user + session in test_database, 1 TEST_grams_multi_flour recipe (deleted after test).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "FlourBlend now takes params prop and calls computeDough to derive per-flour grams. Test IDs used: mode-percent/mode-grams, input-flour-g, calc-tab-farine (calculator) / tab-farine (recipe form), select-preferment (radix Select - use get_by_role('option', name='Biga')), slider-preferment-flour (Radix Slider - focus via get_by_role('slider'), aria-valuenow lives on the thumb, use ArrowRight/Left to change), flour-percent-<i>, flour-grams-<i>, flour-add-<groupTitle>. Recipe save button data-testid=save-recipe-button.",
+  "detailed_results": {
+    "test1_grams_single_blend": "PASS. flour_g=1000, 60/40 -> 600g/400g; 70/30 -> 700g/300g (live updates on percent change).",
+    "test2_grams_biga_split": "PASS. flour_g=1000, biga=50%. Group headers 'Farine per la biga' (500g nella biga) + 'Farine per l'impasto finale (rinfresco)' (500g nel rinfresco). Biga 50/50 -> 250g/250g. Final 70/30 -> 350g/150g. Ricetta finale shows Preimpasto Biga 500g / Impasto finale 500g flour.",
+    "test3_percent_mode_grams": "PASS. Default percent mode (pieces=4, piece_weight=250) with 60/40 percents -> 358g/238g (from ~596g total flour). Correct proportion.",
+    "test4_grams_hint": "PASS. Hint 'La \"Farina totale\" viene ripartita tra i vari tipi di farina nella scheda Farine (W).' shown in grams mode. With biga selected it appends ', divisa automaticamente tra biga e impasto finale.'",
+    "test5_recipe_form_regression": "PASS. RecipeForm /ricette/nuova in grams mode with 2 flours (60/40 on 1200g) shows 720g/480g on tab-farine. Save-recipe-button succeeds and navigates to /ricette/:id. Detail page renders totals (1200g). Note: per-flour breakdown not surfaced on detail page (aggregate only)."
+  },
+  "rca of the issue": "No issues found. FlourBlend enhancement to distribute total flour across flour types and, with biga, across biga/final groups works correctly in both Calcolatore and RecipeForm."
+}

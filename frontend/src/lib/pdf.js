@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { computeDough, computeBlend, round } from "./doughMath";
+import { computeDough, computeBlend, computeFlourGrams, round } from "./doughMath";
 import { CATEGORY_MAP, PREFERMENT_LABELS, YEAST_LABELS } from "./categories";
 
 const CRUST = [194, 83, 59];
@@ -110,7 +110,13 @@ export function exportRecipePdf(recipe) {
   if (flours.length) {
     line(10);
     section(`Mix di farine · W ${wAvg}`);
-    flours.forEach((f) => row(f.name || "Farina", `W ${f.w || "—"} · ${f.percent}%`));
+    const grams = computeFlourGrams(recipe);
+    const isBiga = recipe.preferment_type === "biga";
+    (recipe.flours || []).forEach((f, i) => {
+      if (!f.name && !f.percent) return;
+      const tag = isBiga ? (f.use === "biga" ? " [biga]" : " [impasto]") : "";
+      row(`${f.name || "Farina"}${tag}`, `W ${f.w || "—"} · ${f.percent}% · ${round(grams[i] || 0, 0)} g`);
+    });
   }
 
   const steps = (recipe.ferment_steps || []);
