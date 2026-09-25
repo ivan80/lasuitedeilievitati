@@ -16,7 +16,7 @@ export default function Login() {
           <div className="w-11 h-11 rounded-2xl bg-crust flex items-center justify-center">
             <CookingPot size={24} weight="duotone" className="text-paper" />
           </div>
-          <span className="font-heading text-2xl tracking-tight text-ink">Impasto</span>
+          <span className="font-heading text-2xl tracking-tight text-ink">Lievita</span>
         </div>
 
         <div className="max-w-lg py-16">

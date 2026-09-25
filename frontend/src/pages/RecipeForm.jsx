@@ -6,6 +6,7 @@ import { DoughBreakdown } from "../components/DoughBreakdown";
 import { FlourBlend } from "../components/FlourBlend";
 import { LeaveningPlanner } from "../components/LeaveningPlanner";
 import { CATEGORIES } from "../lib/categories";
+import { bigaSchedule } from "../lib/doughMath";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -20,6 +21,7 @@ const DEFAULTS = {
   category: "pizza_tonda",
   description: "",
   image_path: null,
+  input_mode: "percent",
   pieces: 4,
   piece_weight: 250,
   hydration: 65,
@@ -29,9 +31,18 @@ const DEFAULTS = {
   oil: 0,
   sugar: 0,
   malt: 0,
+  flour_g: 1000,
+  water_g: 650,
+  salt_g: 25,
+  yeast_g: 3,
+  oil_g: 0,
+  sugar_g: 0,
+  malt_g: 0,
   preferment_type: "diretto",
   preferment_flour_percent: 0,
-  flours: [{ name: "", w: 260, percent: 100 }],
+  biga_management: "ta",
+  biga_fridge_hours: 20,
+  flours: [{ name: "", w: 260, percent: 100, use: "impasto" }],
   ferment_steps: [{ label: "Puntata TA", location: "TA", temperature: 24, hours: 2 }],
   steps: [""],
   notes: "",
@@ -172,9 +183,23 @@ export default function RecipeForm() {
               <DoughForm params={params} setParams={setParams} />
             </TabsContent>
             <TabsContent value="farine" className="pt-6">
-              <FlourBlend flours={params.flours} setFlours={setFlours} />
+              <FlourBlend flours={params.flours} setFlours={setFlours} bigaMode={params.preferment_type === "biga"} />
             </TabsContent>
             <TabsContent value="lievitazione" className="pt-6">
+              {params.preferment_type === "biga" && (
+                <button
+                  data-testid="apply-biga-schedule"
+                  onClick={() =>
+                    setFerment((prev) => [
+                      ...bigaSchedule(params.biga_management, params.biga_fridge_hours),
+                      ...prev.filter((s) => !String(s.label).toLowerCase().startsWith("biga")),
+                    ])
+                  }
+                  className="mb-4 inline-flex items-center gap-1 text-crust hover:text-crustDark text-sm font-medium"
+                >
+                  + Applica programma biga ({params.biga_management === "frigo" ? `1h TA + ${params.biga_fridge_hours}h frigo` : "18h a 18°C"})
+                </button>
+              )}
               <LeaveningPlanner steps={params.ferment_steps} setSteps={setFerment} editable />
             </TabsContent>
           </Tabs>

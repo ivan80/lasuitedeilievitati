@@ -6,7 +6,7 @@ import { LeaveningPlanner } from "../components/LeaveningPlanner";
 import { AISuggest } from "../components/AISuggest";
 import { TimersPanel } from "../components/TimersPanel";
 import { CATEGORY_MAP, PREFERMENT_LABELS } from "../lib/categories";
-import { computeBlend } from "../lib/doughMath";
+import { computeBlend, computeDough, round } from "../lib/doughMath";
 import { exportRecipePdf } from "../lib/pdf";
 import api from "../lib/api";
 import { toast } from "sonner";
@@ -61,6 +61,7 @@ export default function RecipeDetail() {
 
   const cat = CATEGORY_MAP[recipe.category];
   const { wAvg } = computeBlend(recipe.flours);
+  const dough = computeDough(recipe);
   const validFlours = (recipe.flours || []).filter((f) => f.name || f.percent);
 
   return (
@@ -77,7 +78,7 @@ export default function RecipeDetail() {
           {recipe.description && <p className="text-clay mt-4 text-lg leading-relaxed">{recipe.description}</p>}
           <div className="flex flex-wrap gap-2 mt-5">
             <Badge variant="outline" className="border-line text-clay">{PREFERMENT_LABELS[recipe.preferment_type]}</Badge>
-            <Badge variant="outline" className="border-line text-clay">Idratazione {recipe.hydration}%</Badge>
+            <Badge variant="outline" className="border-line text-clay">Idratazione {round(dough.hydrationPct, 0)}%</Badge>
             {wAvg > 0 && <Badge variant="outline" className="border-line text-clay flex items-center gap-1"><Gauge size={14} /> W {wAvg}</Badge>}
           </div>
 

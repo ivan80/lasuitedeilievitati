@@ -9,6 +9,7 @@ import Recipes from "./pages/Recipes";
 import RecipeDetail from "./pages/RecipeDetail";
 import RecipeForm from "./pages/RecipeForm";
 import Calculator from "./pages/Calculator";
+import FlourArchive from "./pages/FlourArchive";
 
 function Loader() {
   return (
@@ -40,6 +41,7 @@ function AppRouter() {
       <Route path="/ricette/:id" element={<Protected><RecipeDetail /></Protected>} />
       <Route path="/ricette/:id/modifica" element={<Protected><RecipeForm /></Protected>} />
       <Route path="/calcolatore" element={<Protected><Calculator /></Protected>} />
+      <Route path="/farine" element={<Protected><FlourArchive /></Protected>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

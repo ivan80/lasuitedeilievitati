@@ -1,21 +1,50 @@
-// Baker's percentages engine. Flour = 100%.
+// Baker's percentages engine. Flour = 100%. Supports percent & grams input modes,
+// biga management (TA 45% vs Frigo 60%, 1% fresh yeast on biga flour, +0.5% diastatic malt).
+
+const num = (v) => Number(v) || 0;
+
+export function bigaHydrationFor(management) {
+  return management === "frigo" ? 60 : 45;
+}
 
 export function computeDough(p) {
-  const pieces = Number(p.pieces) || 1;
-  const pieceWeight = Number(p.piece_weight) || 0;
-  const hydration = Number(p.hydration) || 0;
-  const salt = Number(p.salt) || 0;
-  const yeast = Number(p.yeast) || 0;
-  const oil = Number(p.oil) || 0;
-  const sugar = Number(p.sugar) || 0;
-  const malt = Number(p.malt) || 0;
+  const gramsMode = p.input_mode === "grams";
+  const type = p.preferment_type || "diretto";
+  const prefFlourPct = num(p.preferment_flour_percent);
+  const isBiga = type === "biga";
+  const prefHydration = isBiga
+    ? bigaHydrationFor(p.biga_management)
+    : type === "poolish"
+    ? 100
+    : type === "water_roux"
+    ? 500
+    : 0;
 
-  const totalDough = pieces * pieceWeight;
-  const sumPct = 100 + hydration + salt + yeast + oil + sugar + malt;
-  const flour = sumPct > 0 ? (totalDough * 100) / sumPct : 0;
+  let flour, hydration, salt, yeast, oil, sugar, malt, totalDough;
+
+  if (gramsMode) {
+    flour = num(p.flour_g);
+    const pct = (g) => (flour ? (num(g) / flour) * 100 : 0);
+    hydration = pct(p.water_g);
+    salt = pct(p.salt_g);
+    oil = pct(p.oil_g);
+    sugar = pct(p.sugar_g);
+    yeast = isBiga ? prefFlourPct * 0.01 : pct(p.yeast_g);
+    malt = isBiga ? Math.max(pct(p.malt_g), 0.5) : pct(p.malt_g);
+    totalDough = flour + (flour * (hydration + salt + yeast + oil + sugar + malt)) / 100;
+  } else {
+    hydration = num(p.hydration);
+    salt = num(p.salt);
+    oil = num(p.oil);
+    sugar = num(p.sugar);
+    yeast = isBiga ? prefFlourPct * 0.01 : num(p.yeast);
+    malt = isBiga ? Math.max(num(p.malt), 0.5) : num(p.malt);
+    totalDough = (num(p.pieces) || 1) * num(p.piece_weight);
+    const sumPct = 100 + hydration + salt + yeast + oil + sugar + malt;
+    flour = sumPct > 0 ? (totalDough * 100) / sumPct : 0;
+  }
 
   const g = (pct) => (flour * pct) / 100;
-
   const base = {
     totalDough,
     flour,
@@ -25,34 +54,31 @@ export function computeDough(p) {
     oil: g(oil),
     sugar: g(sugar),
     malt: g(malt),
+    hydrationPct: hydration,
+    saltPct: salt,
+    yeastPct: yeast,
+    maltPct: malt,
+    oilPct: oil,
+    sugarPct: sugar,
+    isBiga,
+    bigaManagement: p.biga_management || "ta",
+    bigaFridgeHours: num(p.biga_fridge_hours) || 20,
   };
 
-  // Preferment breakdown
-  const type = p.preferment_type || "diretto";
-  const prefFlourPct = Number(p.preferment_flour_percent) || 0;
   let preferment = null;
-
   if (type !== "diretto" && prefFlourPct > 0) {
     const prefFlour = (flour * prefFlourPct) / 100;
     let prefWater = 0;
-    let prefHydration = 0;
     let prefYeast = 0;
-    if (type === "biga") {
-      prefHydration = 45;
-      prefWater = (prefFlour * 45) / 100;
-      prefYeast = base.yeast; // solitamente tutto il lievito nella biga
+    if (isBiga) {
+      prefWater = (prefFlour * prefHydration) / 100;
+      prefYeast = (prefFlour * 1) / 100; // 1% lievito fresco sulla farina della biga
     } else if (type === "poolish") {
-      prefHydration = 100;
-      prefWater = prefFlour; // 1:1
+      prefWater = prefFlour;
       prefYeast = base.yeast;
     } else if (type === "water_roux") {
-      prefHydration = 500;
-      prefWater = prefFlour * 5; // 1:5, cotto a 65°C
-      prefYeast = 0;
+      prefWater = prefFlour * 5;
     }
-    const finalFlour = flour - prefFlour;
-    const finalWater = base.water - prefWater;
-    const finalYeast = base.yeast - prefYeast;
     preferment = {
       type,
       hydration: prefHydration,
@@ -60,9 +86,9 @@ export function computeDough(p) {
       water: prefWater,
       yeast: prefYeast,
       final: {
-        flour: finalFlour,
-        water: finalWater > 0 ? finalWater : 0,
-        yeast: finalYeast > 0 ? finalYeast : 0,
+        flour: flour - prefFlour,
+        water: Math.max(0, base.water - prefWater),
+        yeast: Math.max(0, base.yeast - prefYeast),
       },
     };
   }
@@ -87,6 +113,17 @@ export function suggestFermentation(w) {
   if (w < 300) return "W 260-300: 12-24 ore, anche con maturazione in frigo. Perfetta per teglia e alta idratazione.";
   if (w < 350) return "W 300-350: 24-48 ore con lunga maturazione in frigo (4°C). Pizza contemporanea e teglia.";
   return "Farina forte (W≥350): 48-72 ore in frigo. Indicata per grandi lievitati e lunghissime maturazioni.";
+}
+
+// Suggested biga fermentation schedule as ferment steps
+export function bigaSchedule(management, fridgeHours) {
+  if (management === "frigo") {
+    return [
+      { label: "Biga · 1h a TA", location: "TA", temperature: 20, hours: 1 },
+      { label: "Biga · maturazione frigo", location: "Frigo", temperature: 4, hours: Number(fridgeHours) || 20 },
+    ];
+  }
+  return [{ label: "Biga · 18°C", location: "TA", temperature: 18, hours: 18 }];
 }
 
 export function round(n, d = 1) {

@@ -12,6 +12,7 @@ import { CATEGORIES } from "../lib/categories";
 
 const DEFAULTS = {
   category: "pizza_tonda",
+  input_mode: "percent",
   pieces: 4,
   piece_weight: 250,
   hydration: 65,
@@ -21,9 +22,18 @@ const DEFAULTS = {
   oil: 0,
   sugar: 0,
   malt: 0,
+  flour_g: 1000,
+  water_g: 650,
+  salt_g: 25,
+  yeast_g: 3,
+  oil_g: 0,
+  sugar_g: 0,
+  malt_g: 0,
   preferment_type: "diretto",
   preferment_flour_percent: 0,
-  flours: [{ name: "", w: 260, percent: 100 }],
+  biga_management: "ta",
+  biga_fridge_hours: 20,
+  flours: [{ name: "", w: 260, percent: 100, use: "impasto" }],
   ferment_steps: [
     { label: "Puntata TA", location: "TA", temperature: 24, hours: 2 },
     { label: "Maturazione frigo", location: "Frigo", temperature: 4, hours: 24 },
@@ -65,7 +75,7 @@ export default function Calculator() {
               <TabsTrigger value="lievitazione" data-testid="calc-tab-lievitazione">Lievitazione</TabsTrigger>
             </TabsList>
             <TabsContent value="impasto" className="pt-6"><DoughForm params={params} setParams={setParams} /></TabsContent>
-            <TabsContent value="farine" className="pt-6"><FlourBlend flours={params.flours} setFlours={setFlours} /></TabsContent>
+            <TabsContent value="farine" className="pt-6"><FlourBlend flours={params.flours} setFlours={setFlours} bigaMode={params.preferment_type === "biga"} /></TabsContent>
             <TabsContent value="lievitazione" className="pt-6"><LeaveningPlanner steps={params.ferment_steps} setSteps={setFerment} editable /></TabsContent>
           </Tabs>
 

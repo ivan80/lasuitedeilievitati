@@ -71,6 +71,7 @@ class FlourItem(BaseModel):
     name: str = ""
     w: Optional[int] = None
     percent: float = 0
+    use: str = "impasto"  # impasto | biga
 
 
 class FermentStep(BaseModel):
@@ -85,6 +86,7 @@ class RecipeInput(BaseModel):
     category: str
     description: Optional[str] = ""
     image_path: Optional[str] = None
+    input_mode: str = "percent"  # percent | grams
     pieces: int = 1
     piece_weight: float = 250
     hydration: float = 65
@@ -94,8 +96,18 @@ class RecipeInput(BaseModel):
     oil: float = 0
     sugar: float = 0
     malt: float = 0
+    # grams mode (total ingredients in grams)
+    flour_g: float = 0
+    water_g: float = 0
+    salt_g: float = 0
+    yeast_g: float = 0
+    oil_g: float = 0
+    sugar_g: float = 0
+    malt_g: float = 0
     preferment_type: str = "diretto"  # diretto | biga | poolish | water_roux
     preferment_flour_percent: float = 0
+    biga_management: str = "ta"  # ta | frigo
+    biga_fridge_hours: int = 20
     flours: List[FlourItem] = []
     ferment_steps: List[FermentStep] = []
     steps: List[str] = []
@@ -123,6 +135,22 @@ class SessionInput(BaseModel):
 class AIRequest(BaseModel):
     context: str
     question: Optional[str] = ""
+
+
+class FlourInput(BaseModel):
+    name: str
+    brand: Optional[str] = ""
+    w: Optional[int] = None
+    protein: Optional[float] = None
+    absorption: Optional[float] = None
+    notes: Optional[str] = ""
+    datasheet_path: Optional[str] = None
+
+
+class FlourDoc(FlourInput):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 # ---------------- Auth helpers ----------------
@@ -250,6 +278,28 @@ async def duplicate_recipe(recipe_id: str, user: User = Depends(get_current_user
     return copy
 
 
+# ---------------- Flour archive routes ----------------
+@api_router.get("/flours", response_model=List[FlourDoc])
+async def list_flours(user: User = Depends(get_current_user)):
+    docs = await db.flour_archive.find({"user_id": user.user_id}, {"_id": 0}).sort("name", 1).to_list(1000)
+    return [FlourDoc(**d) for d in docs]
+
+
+@api_router.post("/flours", response_model=FlourDoc)
+async def create_flour(body: FlourInput, user: User = Depends(get_current_user)):
+    doc = FlourDoc(user_id=user.user_id, **body.model_dump())
+    await db.flour_archive.insert_one(doc.model_dump())
+    return doc
+
+
+@api_router.delete("/flours/{flour_id}")
+async def delete_flour(flour_id: str, user: User = Depends(get_current_user)):
+    res = await db.flour_archive.delete_one({"id": flour_id, "user_id": user.user_id})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Farina non trovata")
+    return {"ok": True}
+
+
 # ---------------- Upload / Files ----------------
 @api_router.post("/upload")
 async def upload(file: UploadFile = File(...), user: User = Depends(get_current_user)):
@@ -311,7 +361,7 @@ async def ai_suggest(body: AIRequest, user: User = Depends(get_current_user)):
 
 @api_router.get("/")
 async def root():
-    return {"message": "Panetteria API"}
+    return {"message": "Lievita API"}
 
 
 app.include_router(api_router)

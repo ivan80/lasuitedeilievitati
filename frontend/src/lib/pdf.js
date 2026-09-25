@@ -52,7 +52,7 @@ export function exportRecipePdf(recipe) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(...CLAY);
-  const meta = `${PREFERMENT_LABELS[recipe.preferment_type]}  •  Idratazione ${recipe.hydration}%  •  ${recipe.pieces} × ${round(recipe.piece_weight, 0)}g${wAvg ? `  •  W ${wAvg}` : ""}`;
+  const meta = `${PREFERMENT_LABELS[recipe.preferment_type]}  •  Idratazione ${round(d.hydrationPct, 0)}%  •  ${recipe.pieces} × ${round(recipe.piece_weight, 0)}g${wAvg ? `  •  W ${wAvg}` : ""}`;
   doc.text(meta, margin, y);
   line(28);
 
@@ -81,19 +81,20 @@ export function exportRecipePdf(recipe) {
   // Ingredients
   section("Ricetta finale");
   row("Farina", `${round(d.flour, 1)} g`);
-  row(`Acqua (${round(recipe.hydration, 0)}%)`, `${round(d.water, 1)} g`);
-  row(`Sale (${round(recipe.salt, 1)}%)`, `${round(d.salt, 1)} g`);
-  row(`${YEAST_LABELS[recipe.yeast_type] || "Lievito"} (${round(recipe.yeast, 2)}%)`, `${round(d.yeast, 2)} g`);
-  if (Number(recipe.oil) > 0) row(`Olio (${round(recipe.oil, 1)}%)`, `${round(d.oil, 1)} g`);
-  if (Number(recipe.sugar) > 0) row(`Zucchero (${round(recipe.sugar, 1)}%)`, `${round(d.sugar, 1)} g`);
-  if (Number(recipe.malt) > 0) row(`Malto (${round(recipe.malt, 1)}%)`, `${round(d.malt, 1)} g`);
+  row(`Acqua (${round(d.hydrationPct, 0)}%)`, `${round(d.water, 1)} g`);
+  row(`Sale (${round(d.saltPct, 1)}%)`, `${round(d.salt, 1)} g`);
+  row(`${YEAST_LABELS[recipe.yeast_type] || "Lievito"} (${round(d.yeastPct, 2)}%)`, `${round(d.yeast, 2)} g`);
+  if (d.oil > 0) row(`Olio (${round(d.oilPct, 1)}%)`, `${round(d.oil, 1)} g`);
+  if (d.sugar > 0) row(`Zucchero (${round(d.sugarPct, 1)}%)`, `${round(d.sugar, 1)} g`);
+  if (d.malt > 0) row(`Malto diastasico (${round(d.maltPct, 2)}%)`, `${round(d.malt, 1)} g`);
 
   if (d.preferment) {
     line(10);
-    section(`Preimpasto · ${PREFERMENT_LABELS[d.preferment.type]} (${round(d.preferment.hydration, 0)}%)`);
+    const bigaNote = d.isBiga ? (d.bigaManagement === "frigo" ? ` · 1h TA + ${d.bigaFridgeHours}h frigo` : " · ~18h a 18°C") : "";
+    section(`Preimpasto · ${PREFERMENT_LABELS[d.preferment.type]} (${round(d.preferment.hydration, 0)}%${bigaNote})`);
     row("Farina", `${round(d.preferment.flour, 1)} g`);
     row("Acqua", `${round(d.preferment.water, 1)} g`);
-    if (d.preferment.yeast > 0) row("Lievito", `${round(d.preferment.yeast, 2)} g`);
+    if (d.preferment.yeast > 0) row("Lievito fresco (1%)", `${round(d.preferment.yeast, 2)} g`);
     line(6);
     doc.setFont("helvetica", "italic");
     doc.setFontSize(10);

@@ -11,7 +11,7 @@ export const CATEGORIES = [
     label: "Pizza in Teglia",
     tag: "Alta idratazione",
     image:
-      "https://images.unsplash.com/photo-1621792955481-c99c3862283a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwzfHxmb2NhY2NpYXxlbnwwfHx8fDE3ODcwOTE3MjV8MA&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1705537637301-956413896f3c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODR8MHwxfHNlYXJjaHwzfHxyb21hbiUyMHBpenphJTIwYWwlMjB0YWdsaW8lMjB0cmF5fGVufDB8fHx8MTc5MDM3MTYwNnww&ixlib=rb-4.1.0&q=85",
   },
   {
     id: "focaccia",
@@ -32,7 +32,7 @@ export const CATEGORIES = [
     label: "Grandi Lievitati",
     tag: "Panettone, pandoro & colomba",
     image:
-      "https://images.unsplash.com/photo-1549413468-cd78edb7e75c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHw0fHxhcnRpc2FuJTIwc291cmRvdWdoJTIwYnJlYWR8ZW58MHx8fHwxNzg3MDkxNzI1fDA&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1481391145929-5bcf567d5211?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxwYW5ldHRvbmUlMjBjaHJpc3RtYXMlMjBzd2VldCUyMGJyZWFkfGVufDB8fHx8MTc5MDM3MTYwNnww&ixlib=rb-4.1.0&q=85",
   },
 ];
 

@@ -14,15 +14,16 @@ function buildContext(params) {
   return [
     `Categoria: ${cat}`,
     `Pezzi: ${params.pieces} x ${round(params.piece_weight, 0)}g (impasto totale ${round(d.totalDough, 0)}g)`,
-    `Idratazione: ${params.hydration}%`,
-    `Sale: ${params.salt}%`,
-    `Lievito: ${params.yeast}% (${YEAST_LABELS[params.yeast_type] || params.yeast_type})`,
-    `Olio: ${params.oil}% | Zucchero: ${params.sugar}% | Malto: ${params.malt}%`,
+    `Idratazione: ${round(d.hydrationPct, 1)}%`,
+    `Sale: ${round(d.saltPct, 1)}%`,
+    `Lievito: ${round(d.yeastPct, 2)}% (${YEAST_LABELS[params.yeast_type] || params.yeast_type})`,
+    `Olio: ${round(d.oilPct, 1)}% | Zucchero: ${round(d.sugarPct, 1)}% | Malto diastasico: ${round(d.maltPct, 2)}%`,
     `Metodo: ${PREFERMENT_LABELS[params.preferment_type]}${params.preferment_type !== "diretto" ? ` (${params.preferment_flour_percent}% farina nel preimpasto)` : ""}`,
+    d.isBiga ? `Biga: idratazione ${round(d.preferment?.hydration || 0, 0)}%, 1% lievito fresco sulla farina della biga, gestione ${d.bigaManagement === "frigo" ? `frigo (1h TA + ${d.bigaFridgeHours}h a 4°C)` : "18h a 18°C"}, +0,5% malto diastasico` : "",
     `Farine: ${flours}`,
     `Lievitazione: ${ferment}`,
     `Farina calcolata: ${round(d.flour, 0)}g, acqua ${round(d.water, 0)}g`,
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 export const AISuggest = ({ params }) => {

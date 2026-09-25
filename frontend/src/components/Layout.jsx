@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { CookingPot, House, BookOpen, Calculator, SignOut } from "@phosphor-icons/react";
+import { CookingPot, House, BookOpen, Calculator, SignOut, Flask } from "@phosphor-icons/react";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -11,6 +11,7 @@ export const Navbar = () => {
     { to: "/dashboard", label: "Dashboard", icon: House },
     { to: "/ricette", label: "Ricette", icon: BookOpen },
     { to: "/calcolatore", label: "Calcolatore", icon: Calculator },
+    { to: "/farine", label: "Farine", icon: Flask },
   ];
 
   return (
@@ -24,7 +25,7 @@ export const Navbar = () => {
           <div className="w-9 h-9 rounded-xl bg-crust flex items-center justify-center">
             <CookingPot size={20} weight="duotone" className="text-paper" />
           </div>
-          <span className="font-heading text-xl tracking-tight text-ink">Impasto</span>
+          <span className="font-heading text-xl tracking-tight text-ink">Lievita</span>
         </button>
 
         <nav className="hidden md:flex items-center gap-1">
