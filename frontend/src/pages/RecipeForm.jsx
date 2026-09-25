@@ -183,7 +183,7 @@ export default function RecipeForm() {
               <DoughForm params={params} setParams={setParams} />
             </TabsContent>
             <TabsContent value="farine" className="pt-6">
-              <FlourBlend flours={params.flours} setFlours={setFlours} bigaMode={params.preferment_type === "biga"} />
+              <FlourBlend flours={params.flours} setFlours={setFlours} bigaMode={params.preferment_type === "biga"} params={params} />
             </TabsContent>
             <TabsContent value="lievitazione" className="pt-6">
               {params.preferment_type === "biga" && (

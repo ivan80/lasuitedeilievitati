@@ -97,6 +97,10 @@ export const DoughForm = ({ params, setParams }) => {
           <NumField label="Olio" value={params.oil_g} onChange={(v) => up("oil_g", Number(v))} unit="g" testid="input-oil-g" step={1} />
           <NumField label="Zucchero" value={params.sugar_g} onChange={(v) => up("sugar_g", Number(v))} unit="g" testid="input-sugar-g" step={1} />
           <NumField label="Malto" value={params.malt_g} onChange={(v) => up("malt_g", Number(v))} unit="g" testid="input-malt-g" step={0.5} disabled={isBiga} />
+          <p className="col-span-2 md:col-span-4 text-sm text-clay flex items-start gap-2">
+            <Info size={18} className="text-olive shrink-0 mt-0.5" />
+            La "Farina totale" viene ripartita tra i vari tipi di farina nella scheda <span className="font-medium text-ink">Farine (W)</span>{isBiga ? ", divisa automaticamente tra biga e impasto finale." : "."}
+          </p>
         </div>
       )}
 

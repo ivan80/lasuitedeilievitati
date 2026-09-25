@@ -75,7 +75,7 @@ export default function Calculator() {
               <TabsTrigger value="lievitazione" data-testid="calc-tab-lievitazione">Lievitazione</TabsTrigger>
             </TabsList>
             <TabsContent value="impasto" className="pt-6"><DoughForm params={params} setParams={setParams} /></TabsContent>
-            <TabsContent value="farine" className="pt-6"><FlourBlend flours={params.flours} setFlours={setFlours} bigaMode={params.preferment_type === "biga"} /></TabsContent>
+            <TabsContent value="farine" className="pt-6"><FlourBlend flours={params.flours} setFlours={setFlours} bigaMode={params.preferment_type === "biga"} params={params} /></TabsContent>
             <TabsContent value="lievitazione" className="pt-6"><LeaveningPlanner steps={params.ferment_steps} setSteps={setFerment} editable /></TabsContent>
           </Tabs>
 
