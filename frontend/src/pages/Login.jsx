@@ -13,10 +13,8 @@ export default function Login() {
       {/* Left: content */}
       <div className="flex flex-col justify-between p-8 md:p-14 lg:p-16 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-crust flex items-center justify-center">
-            <CookingPot size={24} weight="duotone" className="text-paper" />
-          </div>
-          <span className="font-heading text-2xl tracking-tight text-ink">Lievita</span>
+          <img src="/logo.png" alt="La Suite dei Lievitati" className="h-14 w-14 object-contain mix-blend-multiply" />
+          <span className="font-heading text-2xl tracking-tight text-ink">La Suite dei Lievitati</span>
         </div>
 
         <div className="max-w-lg py-16">

@@ -22,10 +22,8 @@ export const Navbar = () => {
           onClick={() => navigate("/dashboard")}
           className="flex items-center gap-2.5"
         >
-          <div className="w-9 h-9 rounded-xl bg-crust flex items-center justify-center">
-            <CookingPot size={20} weight="duotone" className="text-paper" />
-          </div>
-          <span className="font-heading text-xl tracking-tight text-ink">Lievita</span>
+          <img src="/logo.png" alt="La Suite dei Lievitati" className="h-10 w-10 object-contain mix-blend-multiply" />
+          <span className="hidden sm:block font-heading text-xl tracking-tight text-ink leading-none">La Suite dei Lievitati</span>
         </button>
 
         <nav className="hidden md:flex items-center gap-1">
