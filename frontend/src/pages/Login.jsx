@@ -1,5 +1,5 @@
 import React from "react";
-import { CookingPot, ArrowRight, Timer, Scales, Flask } from "@phosphor-icons/react";
+import { ArrowRight, Timer, Scales, Flask } from "@phosphor-icons/react";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 export default function Login() {
@@ -13,8 +13,7 @@ export default function Login() {
       {/* Left: content */}
       <div className="flex flex-col justify-between p-8 md:p-14 lg:p-16 relative z-10">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="La Suite dei Lievitati" className="h-14 w-14 object-contain mix-blend-multiply" />
-          <span className="font-heading text-2xl tracking-tight text-ink">La Suite dei Lievitati</span>
+          <img src="/logo-transparent.png" alt="La Suite dei Lievitati" className="h-24 md:h-28 w-auto object-contain" />
         </div>
 
         <div className="max-w-lg py-16">
